@@ -6,6 +6,14 @@
 #import "@preview/theorion:0.4.1": *
 #import "@preview/mitex:0.2.5": *
 #import "@preview/equate:0.3.2": *
+
+#set text(
+  font: (
+    "Libertinus Serif",
+    "Noto Serif CJK SC",
+  )
+)
+
 #import cosmos.clouds: *
 #show: show-theorion
 #set-inherited-levels(1)
@@ -59,7 +67,7 @@ $ L lr((hat(theta)), size: #50%) - inf_(theta in Theta) L(theta) <= c/n + o(1/n)
 #align(center + horizon)[
   #theorem()[
     Suppose that\ 
-    (a) $hat(theta)$ as $n -> infinity$ (i.e. consistency of θˆ), \
+    (a) $hat(theta)$ as $n -> infinity$ (i.e. consistency of $hat(theta)$), \
     (b) #mi(`\nabla^2 L(\theta^*)`) is full rank, and \
     (c) other appropriate regularity conditions hold.
 
