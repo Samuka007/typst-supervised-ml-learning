@@ -7,16 +7,14 @@
 #import "@preview/mitex:0.2.5": *
 #import "@preview/equate:0.3.2": *
 
-#set text(
-  font: (
-    "Libertinus Serif",
-    "Noto Serif CJK SC",
-  )
-)
+#set-inherited-levels(1)
+#set-zero-fill(true)
+#set-leading-zero(true)
+#set-theorion-numbering("1")
 
 #import cosmos.clouds: *
 #show: show-theorion
-#set-inherited-levels(1)
+#set-inherited-levels(0)
 
 // cetz and fletcher bindings for touying
 #let cetz-canvas = touying-reducer.with(reduce: cetz.canvas, cover: cetz.draw.hide.with(bounds: true))
@@ -28,7 +26,15 @@
 )
 
 #set heading(numbering: numbly("{1}.", default: "1.1"))
-#set text(size: 20pt)
+
+#set text(
+  font: (
+    "Libertinus Serif",
+    "Noto Serif CJK SC",
+  ),
+  cjk-latin-spacing: auto,
+  size: 20pt
+)
 
 #title-slide[
   #heading(level: 1, outlined: false, numbering: none)[Asymptotic Analysis]
@@ -83,10 +89,10 @@ $ L lr((hat(theta)), size: #50%) - inf_(theta in Theta) L(theta) <= c/n + o(1/n)
     3. $n(#pop-loss-diff) = O_P (1)$. <eq:asymp-risk>
 
     4. $n(#pop-loss-diff) ->^d 1/2 norm(S)^2_2 "where" \
-      S ~ cal(N)(0, (nabla^2L(theta^*))^(-1/2)"Cov"(nabla cal(l)((x,y), theta^*))(nabla^2 L(theta^*))^(-1/2))$. <eq:asymp-risk-dist>
+      S ~ cal(N)(0, (nabla^2L(theta^*))^(-1/2) "Cov"(nabla cal(l)((x,y), theta^*))(nabla^2 L(theta^*))^(-1/2))$. <eq:asymp-risk-dist>
     
-    5. $lim_(n -> infinity) EE [n(#pop-loss-diff)] = 1/2tr(nabla^2 L(theta^*)^(-1)"Cov"(nabla cal(l)((x,y), theta^*)))$.
-  ]
+    5. $lim_(n -> infinity) EE [n(#pop-loss-diff)] = 1/2tr(nabla^2 L(theta^*)^(-1) "Cov"(nabla cal(l)((x,y), theta^*)))$.
+  ] <thm:erm-asymp>
 ]
 
 == Key ideas of the proof
@@ -193,7 +199,7 @@ $ L lr((hat(theta)), size: #50%) - inf_(theta in Theta) L(theta) <= c/n + o(1/n)
   $ 
     sqrt(n)(hat(theta) - theta^*) 
       &->^d nabla^2 L(theta^*)^(-1) cal(N)(0, "Cov"(nabla cal(l)((x,y), theta^*))) #<equate:revoke> \
-      &=^d cal(N)(0, (nabla^2L(theta^*))^(-1)"Cov"(nabla cal(l)((x,y), theta^*))(nabla^2L(theta^*))^(-1)) \
+      &=^d cal(N)(0, (nabla^2L(theta^*))^(-1) "Cov"(nabla cal(l)((x,y), theta^*))(nabla^2L(theta^*))^(-1)) \
     // sqrt(n)(hat(theta) - theta^*) &= O_P (1)
   $
   #theorem-box(title: "1", outlined: false)[$sqrt(n)(hat(theta) - theta^*) &= O_P (1)$]
@@ -210,8 +216,8 @@ $ L lr((hat(theta)), size: #50%) - inf_(theta in Theta) L(theta) <= c/n + o(1/n)
     - 在 @eq:trans-def-before 中，根据定义，由于 $L(hat(theta)) - L(theta^*) >= 0$ ，右边处理完是个非负的二次型，那么这个 Hassian 矩阵也是半正定的，所以可以右边将写成范数平方的形式，即 @eq:trans-def-after。
   ]
   #theorem-box(title: "4", outlined: false)[$
-      n(L(hat(theta)) - L(theta^*)) ->^d 1/2 norm(S)^2_2 "where" \
-      S ~ cal(N)(0, (nabla^2L(theta^*))^(-1/2)"Cov"(nabla cal(l)((x,y), theta^*))(nabla^2 L(theta^*))^(-1/2))
+      n(L(hat(theta)) - L(theta^*)) ->^d 1/2 norm(S)^2_2 "where" #<equate:revoke>\
+      S ~ cal(N)(0, (nabla^2L(theta^*))^(-1/2) "Cov"(nabla cal(l)((x,y), theta^*))(nabla^2 L(theta^*))^(-1/2)) #<equate:revoke>
   $]
   Using a Taylor expansion of $L$ with respect to $theta$ around $theta^*$, we find
   $
@@ -220,7 +226,7 @@ $ L lr((hat(theta)), size: #50%) - inf_(theta in Theta) L(theta) <= c/n + o(1/n)
 ]
 
 #slide[
-  #theorem-box(title: "4", outlined: false)[$sqrt(n)(hat(theta) - theta^*) ->^d cal(N)(0, (nabla^2L(theta^*))^(-1)"Cov"(nabla cal(l)((x,y), theta^*))(nabla^2L(theta^*))^(-1)).$]
+  #theorem-box(title: "4", outlined: false)[$sqrt(n)(hat(theta) - theta^*) ->^d cal(N)(0, (nabla^2L(theta^*))^(-1) "Cov"(nabla cal(l)((x,y), theta^*))(nabla^2L(theta^*))^(-1)).$]
   For minimizer $theta^*$, we have $nabla L(theta^*) = 0$. Rearranging and multiplying both sides by $n$, we get
   $
     n(#pop-loss-diff) 
@@ -240,8 +246,8 @@ $ L lr((hat(theta)), size: #50%) - inf_(theta in Theta) L(theta) <= c/n + o(1/n)
   $
   i.e. the random vector inside the norm. As $n -> oo$, we have $n(#pop-loss-diff) ->^d 1/2 norm(S)^2_2$, where
   $
-    S &~ nabla^2 L(theta^*)^(1/2) cal(N)(0, nabla^2 L(theta^*)^(-1)"Cov"(nabla cal(l)((x,y), theta^*))nabla^2L(theta^*)^(-1)) \
-      &= cal(N)(0, nabla^2L(theta^*)^(-1/2)"Cov"(nabla cal(l)((x,y), theta^*))nabla^2 L(theta^*)^(-1/2)).
+    S &~ nabla^2 L(theta^*)^(1/2) cal(N)(0, nabla^2 L(theta^*)^(-1) "Cov"(nabla cal(l)((x,y), theta^*))nabla^2L(theta^*)^(-1)) \
+      &= cal(N)(0, nabla^2L(theta^*)^(-1/2) "Cov"(nabla cal(l)((x,y), theta^*))nabla^2 L(theta^*)^(-1/2)).
   $
   #theorion-restate(filter: <lem:slutsky-1>)
 ]
@@ -249,9 +255,34 @@ $ L lr((hat(theta)), size: #50%) - inf_(theta in Theta) L(theta) <= c/n + o(1/n)
 == Proof of part 5
 
 #slide[
+  Since $EE(S) = 0$, and using the feature that the trace operator is invariant under cyclic permutations, and some regularity conditions (TODO 补充),
+  $
+    lim_(n->oo) EE[n(#pop-loss-diff)]
+      &= 1/2 EE[norm(S)^2_2] = 1/2 EE[tr(S^top S)] \ 
+      &= 1/2 EE[tr(S S^top)] = 1/2 tr(EE[S S^top]) \
+      &= 1/2 tr("Cov"(S)) \
+      &= 1/2 tr(nabla^2 L(theta^*)^(-1/2) "Cov"(nabla cal(l)((x,y), theta^*)) nabla^2 L(theta^*)^(-1/2)) \
+      &= 1/2 tr(nabla^2 L(theta^*)^(-1) "Cov"(nabla cal(l)((x,y), theta^*))).
+  $
+]
+
+= Well-specified case
+
+#slide[
+  #speaker-note[
+    Assume that we performing  maximum likelihood estimation (MLE)
+  ]
+  #theorem[
+    In addition to the assumptions of @thm:erm-asymp, suppose there exists a parametric model $P(y mid(|) x; theta ), theta in Theta$, such that ${y^((i)) mid(|) x^((i))}^n_(i=1) ~ P(y^((i)) mid(|) x^((i)); theta_*)$ for some $theta_* in Theta$ (i.e. the model is well-specified). Assume the loss function is the negative log-likelihood: $cal(l)((x,y), theta) = - log P(y mid(|) x; theta)$. As before, let $hat(theta)$ and $theta^*$ denote the minimizers of the empirical risk and population risk respectively. Then
+    $ theta^* = theta_*, $
+    $ EE[nabla cal(l)((x,y), theta^*)] = 0 $
+    $ "Cov"(nabla cal(l)((x,y), theta^*)) = nabla^2 L(theta^*), "and" $
+    $ sqrt(n)(hat(theta) - theta^*) ->^d cal(N)(0, nabla^2 L(theta^*)^(-1)). $
+  ]
+]
+
+== Remark
+
   #lemma[
     If $Z ~ cal(N)(0, Sigma^(-1))$, and $Z in RR^p$, then $Z^top Sigma Z ~ chi^2(p)$.
   ] <lem:chi-squared>
-
-]
-
