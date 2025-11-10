@@ -13,7 +13,7 @@ jobs:
 
     steps:
       - uses: actions/checkout@v4
-      - uses: fontist/setup-fontist@main
+      - uses: fontist/setup-fontist@5b6d1701dcd68e2941068fc7e2d65a81bfb907d1
         with:
           cache-dependency-path: .fontist/manifest.yml
       - run: fontist manifest-install manifest.yml
