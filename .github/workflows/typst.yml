@@ -14,7 +14,9 @@ jobs:
     steps:
       - uses: actions/checkout@v4
       - uses: fontist/setup-fontist@v2
-      - run: fontist install "Noto Serif CJK SC"
+        with:
+          cache-dependency-path: .fontist/manifest.yml
+      # - run: fontist install "Noto Serif CJK SC"
       - uses: typst-community/setup-typst@v4
       - run: typst compile main.typ main.pdf --font-path ~/.fontist/fonts
       - uses: actions/upload-artifact@v4
