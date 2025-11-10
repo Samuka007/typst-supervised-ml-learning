@@ -22,14 +22,7 @@ jobs:
           key: ${{ runner.os }}-font-${{ hashFiles('.fontist/manifest.yml') }}
 
       - name: Set up Ruby and Cache Gems
-        uses: ruby/setup-ruby@v1
-        if: steps.cache-fonts.outputs.cache-hit != 'true'
-        with:
-          ruby-version: '3.3' 
-          bundler-cache: true
-
-      - name: Install Fontist with Cache
-        run: gem install fontist
+        uses: fontist/setup-fontist@v2
         if: steps.cache-fonts.outputs.cache-hit != 'true'
 
       - run: fontist manifest-install .fontist/manifest.yml
