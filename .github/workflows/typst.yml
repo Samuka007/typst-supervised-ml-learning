@@ -4,6 +4,7 @@ on:
   push:
     branches:
       - 'stage'
+      - 'test'
     tags:
       - 'v*'
 
@@ -13,10 +14,27 @@ jobs:
 
     steps:
       - uses: actions/checkout@v4
-      - uses: fontist/setup-fontist@5b6d1701dcd68e2941068fc7e2d65a81bfb907d1
+      - name: Cache Fontist Fonts
+        id: cache-fonts
+        uses: actions/cache@v4
         with:
-          cache-dependency-path: .fontist/manifest.yml
-      - run: fontist manifest-install manifest.yml
+          path: ~/.fontist/fonts
+          key: ${{ runner.os }}-font-${{ hashFiles('.fontist/manifest.yml') }}
+
+      - name: Set up Ruby and Cache Gems
+        uses: ruby/setup-ruby@v1
+        if: steps.cache-fonts.outputs.cache-hit != 'true'
+        with:
+          ruby-version: '3.3' 
+          bundler-cache: true
+
+      - name: Install Fontist with Cache
+        run: gem install fontist
+        if: steps.cache-fonts.outputs.cache-hit != 'true'
+
+      - run: fontist manifest-install .fontist/manifest.yml
+        if: steps.cache-fonts.outputs.cache-hit != 'true'
+
       - uses: typst-community/setup-typst@v4
       - run: typst compile main.typ main.pdf --font-path ~/.fontist/fonts
       - uses: actions/upload-artifact@v4
@@ -34,6 +52,8 @@ jobs:
       - uses: actions/download-artifact@v4
         with:
           name: main
+      - name: Rename PDF for Release
+        run: mv main.pdf typst-${{ github.ref_name }}.pdf
       - uses: softprops/action-gh-release@v2
         with:
-          files: main.pdf
+          files: typst-${{ github.ref_name }}.pdf
