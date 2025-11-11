@@ -36,6 +36,25 @@
   size: 20pt
 )
 
+#show ref: it => {
+  let eq = math.equation
+  let el = it.element
+  // Skip all other references.
+  if el == none or el.func() != eq { return it }
+  // Override equation references.
+  link(el.location(), numbering(
+    el.numbering,
+    ..counter(eq).at(el.location())
+  ))
+}
+
+#let restate_eq(target) = context {
+  let results = query(
+    selector(target)
+  )
+  text(results.first())
+}
+
 #title-slide[
   #heading(level: 1, outlined: false, numbering: none)[Asymptotic Analysis]
   #v(2em)
@@ -82,16 +101,16 @@ $ L lr((hat(theta)), size: #50%) - inf_(theta in Theta) L(theta) <= c/n + o(1/n)
     #set math.equation(numbering: none)
     Then,
 
-    1. $sqrt(n)(hat(theta) - theta^*) = O_P (1)$. <eq:asymp-norm>
+    #block[1. $sqrt(n)(hat(theta) - theta^*) = O_P (1)$.] <thm:erm-asymp-1>
 
-    2. $sqrt(n)(hat(theta) - theta^*) ->^d cal(N)(0, (nabla^2L(theta^*))^(-1)"Cov"(nabla cal(l)((x,y), theta^*))(nabla^2L(theta^*))^(-1))$. <eq:asymp-dist>
+    #block[2. $sqrt(n)(hat(theta) - theta^*) ->^d cal(N)(0, (nabla^2L(theta^*))^(-1)"Cov"(nabla cal(l)((x,y), theta^*))(nabla^2L(theta^*))^(-1))$.] <thm:erm-asymp-2>
 
-    3. $n(#pop-loss-diff) = O_P (1)$. <eq:asymp-risk>
+    #block[3. $n(#pop-loss-diff) = O_P (1)$.] <thm:erm-asymp-3>
 
-    4. $n(#pop-loss-diff) ->^d 1/2 norm(S)^2_2 "where" \
-      S ~ cal(N)(0, (nabla^2L(theta^*))^(-1/2) "Cov"(nabla cal(l)((x,y), theta^*))(nabla^2 L(theta^*))^(-1/2))$. <eq:asymp-risk-dist>
+    #block[4. $n(#pop-loss-diff) ->^d 1/2 norm(S)^2_2 "where" \
+      S ~ cal(N)(0, (nabla^2L(theta^*))^(-1/2) "Cov"(nabla cal(l)((x,y), theta^*))(nabla^2 L(theta^*))^(-1/2))$.] <thm:erm-asymp-4>
     
-    5. $lim_(n -> infinity) EE [n(#pop-loss-diff)] = 1/2tr(nabla^2 L(theta^*)^(-1) "Cov"(nabla cal(l)((x,y), theta^*)))$.
+    #block[5. $lim_(n -> infinity) EE [n(#pop-loss-diff)] = 1/2tr(nabla^2 L(theta^*)^(-1) "Cov"(nabla cal(l)((x,y), theta^*)))$.] <thm:erm-asymp-5>
   ] <thm:erm-asymp>
 ]
 
@@ -136,7 +155,7 @@ $ L lr((hat(theta)), size: #50%) - inf_(theta in Theta) L(theta) <= c/n + o(1/n)
     - 由于 $hat(theta)$ 是经验风险的极小值点，我们有 $nabla hat(L)(hat(theta)) = 0$。
   ]
 
-  By definition, $hat(theta)$ minimizes the empirical risk, so we have $nabla hat(L)(hat(theta)) = 0$.
+  _*Proof.*_ By definition, $hat(theta)$ minimizes the empirical risk, so we have $nabla hat(L)(hat(theta)) = 0$.
   We perform a Taylor expansion of $nabla hat(L)(theta)$ around $theta^*$:
   $ 
   0 = nabla hat(L)(hat(theta)) = nabla hat(L)(theta^*) + nabla^2 hat(L)(theta^*)(hat(theta) - theta^*) + O(norm(hat(theta) - theta^*)^2_2). 
@@ -157,7 +176,7 @@ $ L lr((hat(theta)), size: #50%) - inf_(theta in Theta) L(theta) <= c/n + o(1/n)
   #theorion-restate(filter: <thm:clt-iid>)
 ]
 #slide[
-  #theorem-box(title: "2", outlined: false)[$sqrt(n)(hat(theta) - theta^*) ->^d cal(N)(0, (nabla^2L(theta^*))^(-1)"Cov"(nabla cal(l)((x,y), theta^*))(nabla^2L(theta^*))^(-1)).$]
+  #theorem-box(title: "Part 2", outlined: false)[$sqrt(n)(hat(theta) - theta^*) ->^d cal(N)(0, (nabla^2L(theta^*))^(-1)"Cov"(nabla cal(l)((x,y), theta^*))(nabla^2L(theta^*))^(-1)).$]
   Let $X_i = nabla cal(l)((x_i, y_i), theta^*)$ and $hat(X) = nabla hat(L) (theta^*)$, applying @thm:clt-iid,
   $
     sqrt(n) (nabla hat(L)(theta^*) - EE(nabla hat(L)(theta^*))) ->^d cal(N)(0, "Cov"(nabla cal(l)((x,y), theta^*)))
@@ -172,7 +191,7 @@ $ L lr((hat(theta)), size: #50%) - inf_(theta in Theta) L(theta) <= c/n + o(1/n)
   $ <eq:clt-nabla-empirical-risk>
 ]
 #slide[
-  #theorem-box(title: "2", outlined: false)[$sqrt(n)(hat(theta) - theta^*) ->^d cal(N)(0, (nabla^2L(theta^*))^(-1)"Cov"(nabla cal(l)((x,y), theta^*))(nabla^2L(theta^*))^(-1)).$]
+  #theorem-box(title: "Part 2", outlined: false)[$sqrt(n)(hat(theta) - theta^*) ->^d cal(N)(0, (nabla^2L(theta^*))^(-1)"Cov"(nabla cal(l)((x,y), theta^*))(nabla^2L(theta^*))^(-1)).$]
   #set math.equation(numbering: none)
   Recall @eq:taylor-expansion-rearranged,
   $
@@ -202,7 +221,7 @@ $ L lr((hat(theta)), size: #50%) - inf_(theta in Theta) L(theta) <= c/n + o(1/n)
       &=^d cal(N)(0, (nabla^2L(theta^*))^(-1) "Cov"(nabla cal(l)((x,y), theta^*))(nabla^2L(theta^*))^(-1)) \
     // sqrt(n)(hat(theta) - theta^*) &= O_P (1)
   $
-  #theorem-box(title: "1", outlined: false)[$sqrt(n)(hat(theta) - theta^*) &= O_P (1)$]
+  #theorem-box(title: "Part 1", outlined: false)[$sqrt(n)(hat(theta) - theta^*) &= O_P (1)$]
   Part 1 follows directly from Part 2 by the following fact: If $X_n ->^d X$ for some probability distribution $P$, then $X_n = O_P (1)$.
 ]
 
@@ -215,18 +234,27 @@ $ L lr((hat(theta)), size: #50%) - inf_(theta in Theta) L(theta) <= c/n + o(1/n)
     - 为了使用 Part 1 & 2 中的结论，我们整理等式后乘上 $n$，将 $hat(theta) - theta^*$ 转化为 $sqrt(n)(hat(theta) - theta^*)$ 处理。
     - 在 @eq:trans-def-before 中，根据定义，由于 $L(hat(theta)) - L(theta^*) >= 0$ ，右边处理完是个非负的二次型，那么这个 Hassian 矩阵也是半正定的，所以可以右边将写成范数平方的形式，即 @eq:trans-def-after。
   ]
-  #theorem-box(title: "4", outlined: false)[$
-      n(L(hat(theta)) - L(theta^*)) ->^d 1/2 norm(S)^2_2 "where" #<equate:revoke>\
+  #theorem-box(title: "Part 4", outlined: false)[$n(L(hat(theta)) - L(theta^*)) ->^d 1/2 norm(S)^2_2$ where
+    $
       S ~ cal(N)(0, (nabla^2L(theta^*))^(-1/2) "Cov"(nabla cal(l)((x,y), theta^*))(nabla^2 L(theta^*))^(-1/2)) #<equate:revoke>
-  $]
+    $
+  ]
   Using a Taylor expansion of $L$ with respect to $theta$ around $theta^*$, we find
   $
-    L(hat(theta)) = L(theta^*) + 1/2 (hat(theta) - theta^*)^top nabla^2 L(theta^*) (hat(theta) - theta^*) + o(norm(hat(theta) - theta^*)^2_2).
+    L(hat(theta)) &= L(theta^*) + 
+      chevron.l underbrace(nabla L(theta^*), 0), hat(theta) - theta^* chevron.r \ 
+      &+ 1/2 (hat(theta) - theta^*)^top nabla^2 L(theta^*) (hat(theta) - theta^*) + 
+      o(norm(hat(theta) - theta^*)^2_2).
   $
+  For minimizer $theta^*$, we have $nabla L(theta^*) = 0$. Rearranging and multiplying both sides by $n$, we get
 ]
 
 #slide[
-  #theorem-box(title: "4", outlined: false)[$sqrt(n)(hat(theta) - theta^*) ->^d cal(N)(0, (nabla^2L(theta^*))^(-1) "Cov"(nabla cal(l)((x,y), theta^*))(nabla^2L(theta^*))^(-1)).$]
+    #theorem-box(title: "Part 4", outlined: false)[$n(L(hat(theta)) - L(theta^*)) ->^d 1/2 norm(S)^2_2$ where
+    $
+      S ~ cal(N)(0, (nabla^2L(theta^*))^(-1/2) "Cov"(nabla cal(l)((x,y), theta^*))(nabla^2 L(theta^*))^(-1/2)) #<equate:revoke>
+    $
+  ]
   For minimizer $theta^*$, we have $nabla L(theta^*) = 0$. Rearranging and multiplying both sides by $n$, we get
   $
     n(#pop-loss-diff) 
@@ -245,11 +273,14 @@ $ L lr((hat(theta)), size: #50%) - inf_(theta in Theta) L(theta) <= c/n + o(1/n)
     S = nabla^2 L(theta^*)^(1/2) underbrace(sqrt(n)(hat(theta) - theta^*), "Gaussian" v),
   $
   i.e. the random vector inside the norm. As $n -> oo$, we have $n(#pop-loss-diff) ->^d 1/2 norm(S)^2_2$, where
-  $
-    S &~ nabla^2 L(theta^*)^(1/2) cal(N)(0, nabla^2 L(theta^*)^(-1) "Cov"(nabla cal(l)((x,y), theta^*))nabla^2L(theta^*)^(-1)) \
-      &= cal(N)(0, nabla^2L(theta^*)^(-1/2) "Cov"(nabla cal(l)((x,y), theta^*))nabla^2 L(theta^*)^(-1/2)).
-  $
-  #theorion-restate(filter: <lem:slutsky-1>)
+  #theorem-box[
+    $
+      S &~ nabla^2 L(theta^*)^(1/2) cal(N)(0, nabla^2 L(theta^*)^(-1) "Cov"(nabla cal(l)((x,y), theta^*))nabla^2L(theta^*)^(-1)) \
+        &= cal(N)(0, nabla^2L(theta^*)^(-1/2) "Cov"(nabla cal(l)((x,y), theta^*))nabla^2 L(theta^*)^(-1/2)).
+    $
+    and thus $n(#pop-loss-diff) = O_P (1)$.
+  ]
+  // #theorion-restate(filter: <lem:slutsky-1>)
 ]
 
 == Proof of part 5
@@ -274,15 +305,147 @@ $ L lr((hat(theta)), size: #50%) - inf_(theta in Theta) L(theta) <= c/n + o(1/n)
   ]
   #theorem[
     In addition to the assumptions of @thm:erm-asymp, suppose there exists a parametric model $P(y mid(|) x; theta ), theta in Theta$, such that ${y^((i)) mid(|) x^((i))}^n_(i=1) ~ P(y^((i)) mid(|) x^((i)); theta_*)$ for some $theta_* in Theta$ (i.e. the model is well-specified). Assume the loss function is the negative log-likelihood: $cal(l)((x,y), theta) = - log P(y mid(|) x; theta)$. As before, let $hat(theta)$ and $theta^*$ denote the minimizers of the empirical risk and population risk respectively. Then
-    $ theta^* = theta_*, $
-    $ EE[nabla cal(l)((x,y), theta^*)] = 0 $
-    $ "Cov"(nabla cal(l)((x,y), theta^*)) = nabla^2 L(theta^*), "and" $
-    $ sqrt(n)(hat(theta) - theta^*) ->^d cal(N)(0, nabla^2 L(theta^*)^(-1)). $
+    $ theta^* = theta_* $ <eq:well-specified-param>
+    $ EE[nabla cal(l)((x,y), theta^*)] = 0 $ <eq:well-specified-mean-zero>
+    $ "Cov"(nabla cal(l)((x,y), theta^*)) = nabla^2 L(theta^*) $ <eq:well-specified-fisher-info>
+    $ sqrt(n)(hat(theta) - theta^*) ->^d cal(N)(0, nabla^2 L(theta^*)^(-1)) $ <eq:well-specified-asymp-dist>
   ]
 ]
 
-== Remark
+== Proof of @eq:well-specified-param
+#slide[
+  From the definition of population risk,
+  $
+    L(theta) 
+      &= EE[cal(l)((x,y), theta)] \
+      &= EE[-log P(y mid(|) x; theta)] \
+      &= EE[-log P(y mid(|) x; theta) + log P(y mid(|) x; theta_*)] + EE[-log P(y mid(|) x; theta_*))] \
+      &= EE[log (P(y mid(|) x; theta_*) / P(y mid(|) x; theta))] + EE[-log P(y mid(|) x; theta_*)].
+  $
+  Notice that the second term is a constant which we will express as $cal(H)(y mid(|) x; theta_*)$. We expand the first term using the tower rule (or law of total expectation):
+  $
+    L(theta) 
+      &= EE_x [EE_(y mid(|) x)[log (P(y mid(|) x; theta_*) / P(y mid(|) x; theta))]] + cal(H)(y mid(|) x; theta_*).
+  $
+]
+#slide[
+  #theorem-box()[#restate_eq(<eq:well-specified-param>)]
+  The term in the expectation is just the KL divergence between the two probabilities, so
+  $
+    L(theta) 
+      &= EE["KL"(y|x; theta_* mid(||) y|x; theta)] + cal(H)(y mid(|) x; theta_*) \
+      &>= cal(H)(y mid(|) x; theta_*).
+  $
+  since $"KL"$ divergence is always non-negative. Since $theta_*$ makes the KL divergence term zero, it minimizes $L(theta)$ and so $theta_* in "argmin"_theta L(theta)$. However, the minimizer of $L(theta)$ is unique because of consistency, so we must have $"argmin"_theta L(theta) = theta^*$ which proves @eq:well-specified-param.
+]
 
+== Proof of @eq:well-specified-mean-zero
+
+#slide[
+  #theorem-box[#restate_eq(<eq:well-specified-mean-zero>)]
+  For @eq:well-specified-mean-zero, recall $nabla L(theta^*) = 0$, so we have
+  $
+    0 = nabla L(theta^*) 
+      = nabla EE[cal(l)((x^(i), y^((i))), theta^*)] 
+      = EE[nabla cal(l)((x^(i), y^((i))), theta^*)]
+  $
+  where we can switch the gradient and expectation under some regularity conditions. (What are these conditions?)
+]
+
+== Proof of @eq:well-specified-fisher-info
+
+#slide[
+  #theorem-box[#restate_eq(<eq:well-specified-fisher-info>)]
+  To prove @eq:well-specified-fisher-info, we first expand the RHS using the definition of covariance and express the marginal distributions as integrals:
+  $
+    "Cov"(nabla cal(l)((x,y), theta^*)) 
+      = EE[nabla cal(l)((x,y), theta^*) nabla cal(l)((x,y), theta^*)^top]
+  $
+  $
+      &= integral P(x) (integral P(y | x; theta^*)
+        nabla log P(y^((i)) | x^((i)), theta^*) nabla log P(y^((i)) | x^((i)), theta^*)^top d y) d x \
+      &= integral P(x) (integral 
+          (nabla P(y | x, theta^*) nabla P(y | x, theta^*)^top) / 
+          P(y | x; theta^*) 
+        d y) d x.
+  $
+]
+
+#slide[
+  // #theorem-box()[#restate_eq(<eq:well-specified-fisher-info>)]
+  Now we expand the LHS using the definition of the population risk:
+  $
+    nabla^2 L(theta^*)
+      = EE[-nabla^2 log P(y | x; theta^*)] \
+      = integral P(x) (integral (
+        -nabla^2 P(y | x; theta^*) + 
+        (nabla P(y | x; theta^*) nabla P(y | x; theta^*)^top) / P(y | x; theta^*)
+      ) d y) d x.
+  $
+  Note that we can express the first term as @eq:integral-zero, thus
+  $
+    integral nabla^2 P(y | x; theta^*) d y 
+      = nabla^2 (integral P(y | x; theta^*) d y) 
+      = nabla^2 1 
+      = 0.
+  $ <eq:integral-zero>
+// ]
+
+// #slide[
+  // so we find
+  $
+    nabla^2 L(theta^*) 
+      = integral P(x) (integral 
+        (nabla P(y | x, theta^*) nabla P(y | x, theta^*)^top) / 
+        P(y | x; theta^*) 
+      d y) d x 
+      = "Cov"(nabla cal(l)((x,y), theta^*)) #<equate:revoke>
+  $
+]
+
+== Proof of @eq:well-specified-asymp-dist
+#slide[  
+  $
+    sqrt(n)(hat(theta) - theta^*) 
+      &->^d cal(N)(0, (nabla^2L(theta^*))^(-1) "Cov"(nabla cal(l)((x,y), theta^*))(nabla^2L(theta^*))^(-1)) \
+      &=^d cal(N)(0, (nabla^2L(theta^*))^(-1) nabla^2 L(theta^*) (nabla^2L(theta^*))^(-1)) \
+      &=^d cal(N)(0, nabla^2 L(theta^*)^(-1)). #<equate:revoke>
+  $
+  Finally, @eq:well-specified-asymp-dist follows directly from @thm:erm-asymp Part 2 by substituting @eq:well-specified-fisher-info. #h(1fr) $qed$
+]
+
+== Well-specified case for @eq:erm-bound
+
+#slide[
+  #speaker-note[
+    - Using similar logic to our proof of Part 4 and 5 of Theorem 2.1,
+    - Since a chi-squared distribution with p degrees of freedom is defined as a sum of the squares of p independent standard normals
+  ]
+  #theorem-box(title: ref(<thm:erm-asymp>) + " Part 4", outlined: false)[$n(L(hat(theta)) - L(theta^*)) ->^d 1/2 norm(S)^2_2$ where
+    $
+      S ~ cal(N)(0, (nabla^2L(theta^*))^(-1/2) "Cov"(nabla cal(l)((x,y), theta^*))(nabla^2 L(theta^*))^(-1/2)) #<equate:revoke>
+    $
+  ]
+  #theorem-box[#restate_eq(<eq:well-specified-fisher-info>)]
+  In this case we can see that $n(#pop-loss-diff) ->^d 1/2 norm(S)^2_2$ where $S ~ cal(N)(0, I)$.
   #lemma[
     If $Z ~ cal(N)(0, Sigma^(-1))$, and $Z in RR^p$, then $Z^top Sigma Z ~ chi^2(p)$.
   ] <lem:chi-squared>
+]
+#slide[
+  // #theorion-restate(filter: <lem:chi-squared>)
+  From @lem:chi-squared, given $theta in RR^d$ and $n -> oo$, we have
+  $
+    2n(#pop-loss-diff) &->^d norm(S)^2_2 =^d S^top I S ~ chi^2(d)
+  $
+  Recall our original target @eq:erm-bound,
+  #restate_eq(<eq:erm-bound>)
+  We can thus characterize the excess risk in this case using the properties of a chi-squared distribution:
+  $
+    lim_(n -> oo) EE[#pop-loss-diff] = p/(2n).
+  $
+]
+
+#focus-slide[
+  #heading(level: 1, outlined: false, numbering: none)[Thank you!]
+]
