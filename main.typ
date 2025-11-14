@@ -367,7 +367,7 @@ $ L lr((hat(theta)), size: #50%) - inf_(theta in Theta) L(theta) <= c/n + o(1/n)
 == Proof of part 5
 
 #slide[
-  Since $EE(S) = 0$, and using the feature that the trace operator is invariant under cyclic permutations, and some regularity conditions (TODO 补充),
+  Since $EE(S) = 0$, and using the feature that the trace operator is invariant under cyclic permutations, and some regularity conditions,
   $
     lim_(n->oo) EE[n(#pop-loss-diff)]
       &= 1/2 EE[norm(S)^2_2] = 1/2 EE[tr(S^top S)] \ 
@@ -390,6 +390,16 @@ $ L lr((hat(theta)), size: #50%) - inf_(theta in Theta) L(theta) <= c/n + o(1/n)
     $ EE[nabla cal(l)((x,y), theta^*)] = 0 $ <eq:well-specified-mean-zero>
     $ "Cov"(nabla cal(l)((x,y), theta^*)) = nabla^2 L(theta^*) $ <eq:well-specified-fisher-info>
     $ sqrt(n)(hat(theta) - theta^*) ->^d cal(N)(0, nabla^2 L(theta^*)^(-1)) $ <eq:well-specified-asymp-dist>
+  ]
+]
+
+#slide[
+  #theorem-box()[
+    #restate-equation(<eq:well-specified-asymp-dist>)
+  ]
+  *_Remark_* You may also have seen @eq:well-specified-asymp-dist in the following form: under the maximum likelihood estimation (MLE) paradigm, the MLE is asymptotically efficient as it achieves the Cramer-Rao lower bound. That is, the parameter error of the MLE estimate converges in distribution to $cal(N)(0, cal(I)(theta)^(-1))$, where $cal(I)(theta)$ is the Fisher information matrix (in this case, equivalent to the risk Hessian $nabla L(theta^*)$.
+  #footnote[
+    此处Fisher信息矩阵的符号没找到对应的变体
   ]
 ]
 
@@ -427,33 +437,48 @@ $ L lr((hat(theta)), size: #50%) - inf_(theta in Theta) L(theta) <= c/n + o(1/n)
   For @eq:well-specified-mean-zero, recall $nabla L(theta^*) = 0$, so we have
   $
     0 = nabla L(theta^*) 
-      = nabla EE[cal(l)((x^(i), y^((i))), theta^*)] 
-      = EE[nabla cal(l)((x^(i), y^((i))), theta^*)]
+      = nabla EE[cal(l)((x^((i)), y^((i))), theta^*)] 
+      = EE[nabla cal(l)((x^((i)), y^((i))), theta^*)]
   $
-  where we can switch the gradient and expectation under some regularity conditions. (What are these conditions?)
+  where we can switch the gradient and expectation under some regularity conditions, 
+  like in this case the gradient is bounded and integrable.
 ]
 
 == Proof of @eq:well-specified-fisher-info
 
 #slide[
+  #speaker-note[
+    - By the Law of Total Expectation (or tower rule), $EE_((x,y))[Z] = EE_x[EE_(y|x)[Z]]$
+
+  ]
   #theorem-box[#restate-equation(<eq:well-specified-fisher-info>)]
-  To prove @eq:well-specified-fisher-info, we first expand the RHS using the definition of covariance and express the marginal distributions as integrals:
+  To prove @eq:well-specified-fisher-info, we first expand the RHS using the definition of covariance,
   $
     "Cov"(nabla cal(l)((x,y), theta^*)) 
-      = EE[nabla cal(l)((x,y), theta^*) nabla cal(l)((x,y), theta^*)^top]
+      &= EE[nabla cal(l)((x,y), theta^*) nabla cal(l)((x,y), theta^*)^top] \
+      &= EE_(x)[EE_(y|x)[nabla cal(l)((x,y), theta^*) nabla cal(l)((x,y), theta^*)^top]]
   $
+  express the marginal distributions as integrals
   $
-      &= integral P(x) (integral P(y | x; theta^*)
-        nabla log P(y^((i)) | x^((i)), theta^*) nabla log P(y^((i)) | x^((i)), theta^*)^top d y) d x \
-      &= integral P(x) (integral 
-          (nabla P(y | x, theta^*) nabla P(y | x, theta^*)^top) / 
-          P(y | x; theta^*) 
-        d y) d x.
+    "Cov"(nabla cal(l)((x,y), theta^*)) 
+      &= integral P(x) integral P(y | x; theta^*) (dot) d y d x.
+  $
+]
+#slide[
+  And expanding the inner term with the definition of the loss function,
+  $
+    & "Cov"(nabla cal(l)((x,y), theta^*)) #<equate:revoke> \
+    &= integral P(x) (integral P(y | x; theta^*)
+      nabla log P(y | x, theta^*) nabla log P(y | x, theta^*)^top d y) d x \
+    &= integral P(x) (integral 
+        (nabla P(y | x, theta^*) nabla P(y | x, theta^*)^top) / 
+        P(y | x; theta^*) 
+      d y) d x.
   $
 ]
 
 #slide[
-  // #theorem-box()[#restate-equation(<eq:well-specified-fisher-info>)]
+
   Now we expand the LHS using the definition of the population risk:
   $
     nabla^2 L(theta^*)
@@ -470,10 +495,7 @@ $ L lr((hat(theta)), size: #50%) - inf_(theta in Theta) L(theta) <= c/n + o(1/n)
       = nabla^2 1 
       = 0.
   $ <eq:integral-zero>
-// ]
 
-// #slide[
-  // so we find
   $
     nabla^2 L(theta^*) 
       = integral P(x) (integral 
