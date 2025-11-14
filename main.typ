@@ -7,7 +7,6 @@
 #import "@preview/mitex:0.2.5": *
 #import "@preview/equate:0.3.2": *
 
-#set-inherited-levels(1)
 #set-zero-fill(true)
 #set-leading-zero(true)
 #set-theorion-numbering("1")
@@ -22,7 +21,7 @@
 #show: equate.with(breakable: true, sub-numbering: false)
 #show: simple-theme.with(
   aspect-ratio: "16-9",
-  config-common(frozen-counters: (theorem-counter,), show-notes-on-second-screen: right),  // freeze theorem counter for animation
+  config-common(frozen-counters: (theorem-counter,), show-notes-on-second-screen: none),  // freeze theorem counter for animation
 )
 
 #set heading(numbering: numbly("{1}.", default: "1.1"))
@@ -48,7 +47,7 @@
   ))
 }
 
-#let restate_eq(target) = context {
+#let restate-equation(target) = context {
   let results = query(
     selector(target)
   )
@@ -64,13 +63,98 @@
   Nov 8
 ]
 
-// #set-theorion-numbering("1.1")
-
 == Outline <touying:hidden>
 
 #components.adaptive-columns(outline(title: none, indent: 1em))
 
 #let pop-loss-diff = $L lr((hat(theta)), size: #50%) - L lr((theta^*), size: #50%)$
+
+= Background - Supervised Learning Formulation
+
+== Supervised learning
+#slide[
+  === Problem setup
+  #set math.equation(numbering: none)
+  Suppose we have inputs from input space $cal(X)$ and labels belong to the output 
+  space $cal(Y)$. Suppose we are interested in a specific joint probability 
+  distribution $P$ over $cal(X) times cal(Y)$, from which we can draw i.i.d. samples
+  ${(x^((i)), y^((i)))}^n_(i=1) ~ P$. 
+
+  The goal of supervised learning is to learn a 
+  mapping from $cal(X)$ to $cal(Y)$ using these samples. Such a mapping 
+  $h: cal(X) -> cal(Y)$ is called a _predictor_ (also _hypothesis_ or _model_).
+
+  We measure the quality of a predictor $h$ using a _loss function_. Here we define 
+  a loss function $cal(l): cal(Y) times cal(Y) -> RR$, where the two arguments are 
+  the true label $y$ and the predicted label $hat(y)$ respectively, and give a 
+  number that captures how different the two labels are. We assume $cal(l)(hat(y), y) >= 0$.
+  Then, the loss of a _model_ $h$ on an example $(x, y)$ is defined as $cal(l)(h(x), y)$.
+]
+
+#slide[
+  === Risk definitions
+  The _population risk_ (also _expected risk_ or _true risk_) of a predictor $h$ is 
+  defined as the expected loss over the data distribution:
+  $ L(h) =^triangle limits(EE)_((x,y)~P) [cal(l)(h(x), y)] $
+
+  *Hypothesis class.* In practice, we often restrict our attention within a more 
+  constrained set of predictors $cal(H)$, called the _hypothesis family_ (or 
+  _hypothesis class_), which we know how to optimize over. 
+
+  For one $h in cal(H)$, we define the _excess risk_ of $h$  with respect to $cal(H)$ as
+  the difference between its population risk and the minimum population risk within $cal(H)$:
+  $ L(h) - inf_(g in cal(H)) L(g) $
+]
+
+#slide[
+  === Parameterization
+  By parameterizing the hypothesis class $cal(H)$ using a set of parameters 
+  $theta in Theta$, we can write predictors as $h_theta$ for some $theta in Theta$,
+  making it explicit. An example of such parameterization of the hypothesis class is 
+  $cal(H) = {h: h_theta (x) = theta^top x, theta in RR^d}$.
+]
+
+== Empirical risk minimization (ERM)
+
+#slide[
+  Our goal is to minimize population risk.
+  - We only have a _training set_ of _n_ data points
+  - We cannot compute population risk directly
+  - We can compute _empirical risk_, the loss over the training set
+  - We try to minimize empirical risk instead, i.e. empirical risk minimization (ERM)
+  Define the empirical risk of a model $h$ as:
+  $ 
+  hat(L)(h) 
+    = 1/n sum_(i=1)^n cal(l)(h_theta (x^((i))), y^((i))) 
+    = 1/n sum_(i=1)^n cal(l)((x^((i)), y^((i))), theta)
+  $
+  _Empirical risk minimization_ is the method of finding minimizer $hat(theta)$ of $hat(L)$:
+  $ hat(theta) in "argmin"_(theta in Theta) hat(L)(h_theta) $
+]
+
+#slide[
+  #speaker-note[
+    This is one reason why it makes sense to use empirical risk: 
+    it is an unbiased estimator of the population risk. 
+    
+    The key question that we seek to answer in the first part of this course is: 
+    what guarantees do we have on the excess risk for the parameters learned by 
+    ERM? The hope with ERM is that minimizing the training error will lead to small 
+    testing error. One way to make this rigorous is by showing that the ERM minimizer's 
+    excess risk is bounded.
+  ]
+  Since we are assuming that our training examples are drawn from the same 
+  distribution as the whole population, we know that empirical risk and 
+  population risk are equal in _expectation_ (over the randomness of the 
+  training dataset).
+  $
+    limits(EE)_((x^(i), y^((i))) ~^"iid" P) [hat(L)(h_theta)] 
+      &= limits(EE)_((x^(i), y^((i))) ~^"iid" P) [1/n sum_(i=1)^n cal(l)(h_theta (x^((i))), y^((i)))] \
+      &= 1/n sum_(i=1)^n limits(EE)_((x^(i), y^((i))) ~^"iid" P) [cal(l)(h_theta (x^((i))), y^((i)))] \
+      &= 1/n dot n dot limits(EE)_((x^(i), y^((i))) ~^"iid" P) [cal(l)(h_theta (x), y)] \
+      &= L(h_theta).
+  $
+]
 
 = Theorem
 
@@ -98,7 +182,6 @@ $ L lr((hat(theta)), size: #50%) - inf_(theta in Theta) L(theta) <= c/n + o(1/n)
 
     #colbreak()
 
-    #set math.equation(numbering: none)
     Then,
 
     #block[1. $sqrt(n)(hat(theta) - theta^*) = O_P (1)$.] <thm:erm-asymp-1>
@@ -150,7 +233,6 @@ $ L lr((hat(theta)), size: #50%) - inf_(theta in Theta) L(theta) <= c/n + o(1/n)
 == Proof of part 1 & 2
 #slide[
   #speaker-note[
-    - 让我们从第一部分和第二部分的启发式论证开始。TODO 什么是启发式论证
     - 我们希望将 $hat(theta)$ 与 $theta^*$ 进行比较，因此我们考虑在 $theta^*$ 附近对 $nabla hat(L)(theta)$ 进行泰勒展开。
     - 由于 $hat(theta)$ 是经验风险的极小值点，我们有 $nabla hat(L)(hat(theta)) = 0$。
   ]
@@ -172,7 +254,6 @@ $ L lr((hat(theta)), size: #50%) - inf_(theta in Theta) L(theta) <= c/n + o(1/n)
 
 ]
 #slide[
-  === Recall CLT for i.i.d. means
   #theorion-restate(filter: <thm:clt-iid>)
 ]
 #slide[
@@ -329,7 +410,7 @@ $ L lr((hat(theta)), size: #50%) - inf_(theta in Theta) L(theta) <= c/n + o(1/n)
   $
 ]
 #slide[
-  #theorem-box()[#restate_eq(<eq:well-specified-param>)]
+  #theorem-box()[#restate-equation(<eq:well-specified-param>)]
   The term in the expectation is just the KL divergence between the two probabilities, so
   $
     L(theta) 
@@ -342,7 +423,7 @@ $ L lr((hat(theta)), size: #50%) - inf_(theta in Theta) L(theta) <= c/n + o(1/n)
 == Proof of @eq:well-specified-mean-zero
 
 #slide[
-  #theorem-box[#restate_eq(<eq:well-specified-mean-zero>)]
+  #theorem-box[#restate-equation(<eq:well-specified-mean-zero>)]
   For @eq:well-specified-mean-zero, recall $nabla L(theta^*) = 0$, so we have
   $
     0 = nabla L(theta^*) 
@@ -355,7 +436,7 @@ $ L lr((hat(theta)), size: #50%) - inf_(theta in Theta) L(theta) <= c/n + o(1/n)
 == Proof of @eq:well-specified-fisher-info
 
 #slide[
-  #theorem-box[#restate_eq(<eq:well-specified-fisher-info>)]
+  #theorem-box[#restate-equation(<eq:well-specified-fisher-info>)]
   To prove @eq:well-specified-fisher-info, we first expand the RHS using the definition of covariance and express the marginal distributions as integrals:
   $
     "Cov"(nabla cal(l)((x,y), theta^*)) 
@@ -372,7 +453,7 @@ $ L lr((hat(theta)), size: #50%) - inf_(theta in Theta) L(theta) <= c/n + o(1/n)
 ]
 
 #slide[
-  // #theorem-box()[#restate_eq(<eq:well-specified-fisher-info>)]
+  // #theorem-box()[#restate-equation(<eq:well-specified-fisher-info>)]
   Now we expand the LHS using the definition of the population risk:
   $
     nabla^2 L(theta^*)
@@ -426,7 +507,7 @@ $ L lr((hat(theta)), size: #50%) - inf_(theta in Theta) L(theta) <= c/n + o(1/n)
       S ~ cal(N)(0, (nabla^2L(theta^*))^(-1/2) "Cov"(nabla cal(l)((x,y), theta^*))(nabla^2 L(theta^*))^(-1/2)) #<equate:revoke>
     $
   ]
-  #theorem-box[#restate_eq(<eq:well-specified-fisher-info>)]
+  #theorem-box[#restate-equation(<eq:well-specified-fisher-info>)]
   In this case we can see that $n(#pop-loss-diff) ->^d 1/2 norm(S)^2_2$ where $S ~ cal(N)(0, I)$.
   #lemma[
     If $Z ~ cal(N)(0, Sigma^(-1))$, and $Z in RR^p$, then $Z^top Sigma Z ~ chi^2(p)$.
@@ -439,7 +520,7 @@ $ L lr((hat(theta)), size: #50%) - inf_(theta in Theta) L(theta) <= c/n + o(1/n)
     2n(#pop-loss-diff) &->^d norm(S)^2_2 =^d S^top I S ~ chi^2(d)
   $
   Recall our original target @eq:erm-bound,
-  #restate_eq(<eq:erm-bound>)
+  #restate-equation(<eq:erm-bound>)
   We can thus characterize the excess risk in this case using the properties of a chi-squared distribution:
   $
     lim_(n -> oo) EE[#pop-loss-diff] = p/(2n).
