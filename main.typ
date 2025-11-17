@@ -21,7 +21,7 @@
 #show: equate.with(breakable: true, sub-numbering: false)
 #show: simple-theme.with(
   aspect-ratio: "16-9",
-  config-common(frozen-counters: (theorem-counter,), show-notes-on-second-screen: none),  // freeze theorem counter for animation
+  config-common(frozen-counters: (theorem-counter,), show-notes-on-second-screen: right),  // freeze theorem counter for animation
 )
 
 #set heading(numbering: numbly("{1}.", default: "1.1"))
